@@ -1,0 +1,81 @@
+name: Talks
+options:
+  bundleIdPrefix: com.personal
+  createIntermediateGroups: true
+  xcodeVersion: "16.0"
+
+settings:
+  SWIFT_VERSION: "6.0"
+  ENABLE_USER_SCRIPT_SANDBOXING: NO
+
+targets:
+  Talks:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: Talks/Sources
+      - path: Talks/Resources
+      - path: TalksShared
+    dependencies:
+      - target: TalksWatch
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.personal.talks
+      INFOPLIST_FILE: Talks/Resources/Info.plist
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      CODE_SIGN_STYLE: Automatic
+      CURRENT_PROJECT_VERSION: 1
+      MARKETING_VERSION: 1.0.0
+      GENERATE_INFOPLIST_FILE: NO
+      SWIFT_STRICT_CONCURRENCY: complete
+
+  TalksWatch:
+    type: application
+    platform: watchOS
+    deploymentTarget: "11.0"
+    sources:
+      - path: TalksWatch/Sources
+      - path: TalksWatch/Resources
+      - path: TalksShared
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.personal.talks.watchkitapp
+      INFOPLIST_FILE: TalksWatch/Resources/Info.plist
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      CODE_SIGN_STYLE: Automatic
+      CURRENT_PROJECT_VERSION: 1
+      MARKETING_VERSION: 1.0.0
+      GENERATE_INFOPLIST_FILE: NO
+      SWIFT_STRICT_CONCURRENCY: complete
+
+  TalksTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: TalksTests
+    dependencies:
+      - target: Talks
+    settings:
+      PRODUCT_BUNDLE_IDENTIFIER: com.personal.talkstests
+      GENERATE_INFOPLIST_FILE: YES
+      SWIFT_STRICT_CONCURRENCY: complete
+
+schemes:
+  Talks:
+    build:
+      targets:
+        Talks: all
+    test:
+      targets:
+        - TalksTests
+  TalksWatch:
+    build:
+      targets:
+        TalksWatch: all
+  TalksTests:
+    build:
+      targets:
+        TalksTests: all
+    test:
+      targets:
+        - TalksTests

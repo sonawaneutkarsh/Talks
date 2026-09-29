@@ -1,0 +1,655 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		119447702D28993C96C0ADA1 /* TalksWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D81CAE1B4FC7EDA341A5AF3 /* TalksWatchApp.swift */; };
+		1429937010AD66A023CBCC83 /* SyntheticPipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 809309766F857BF57856147C /* SyntheticPipelineRunner.swift */; };
+		1EC6B80B0E176E63991C722B /* TalkDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF22A842D4E55B0CE23620E /* TalkDetailView.swift */; };
+		333609B475BD3968B58E9EF6 /* MeetingAIService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4727D36B291A4FAE3937F489 /* MeetingAIService.swift */; };
+		4754CE8C5E8B501176AC9B21 /* MeetingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25CD73856F5201AEE388533 /* MeetingModels.swift */; };
+		555408C56ED52074D73693B0 /* MeetingModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25CD73856F5201AEE388533 /* MeetingModels.swift */; };
+		5FEA8A7887A0D09CAFE1480A /* TalksWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 43C92E23F2B1DE45B1CFFD9C /* TalksWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		64481FAE16B71425A102BE63 /* TalksApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5E5F1907633303BCF9021E /* TalksApp.swift */; };
+		9BCE172288A4C01E01F81B35 /* PipelineLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D1480EED55341A839BECA /* PipelineLogger.swift */; };
+		A90C085C2DC5A832FB3409FB /* TranscriptionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CE5AA72510F0324AEB64196 /* TranscriptionService.swift */; };
+		AC10FF25D29A9FE6F0BEE8FA /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E44A5EF95FDE50FEFD9BC525 /* KeychainHelper.swift */; };
+		B31D548E75ED8ABF93F169CC /* PipelineLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9B7D1480EED55341A839BECA /* PipelineLogger.swift */; };
+		C1FC7AF47FAA7683ED674C1F /* TalksConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82176A50A5F460BF02F248CF /* TalksConstants.swift */; };
+		C37ACA686A3294BFB03AF8BC /* PhoneConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03E5AB14723F1391EE4FFEF9 /* PhoneConnectivityManager.swift */; };
+		CC624F1537BAE3AE81E24E8B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E2699FEAA95D0287E4162A15 /* Assets.xcassets */; };
+		D3013DC9C7E369B19ABB5127 /* TalksConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82176A50A5F460BF02F248CF /* TalksConstants.swift */; };
+		D523913A24F549FDA21C8F24 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EF8E942E367BCEEF7087F8A0 /* Assets.xcassets */; };
+		DAE328A736A15C4D14D16E74 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A0E2E74AE67EF347F5B7431 /* SettingsView.swift */; };
+		E2FAE00CD3176EF9B984806E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 847EB41DB3E3F09F39F5DDA0 /* ContentView.swift */; };
+		E5AB03808867BF2D82832FDD /* JobQueueManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A783725BC3DEC49D0564867A /* JobQueueManager.swift */; };
+		EA3FD7EE814C5A0637E19242 /* WatchContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4760009CCACC7B17B32203A3 /* WatchContentView.swift */; };
+		F0AA604C31BFB2B62DCF03DE /* WatchRecordingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B7F3660F66AA3B9880800D /* WatchRecordingManager.swift */; };
+		F21623003326F4642AAC3B86 /* NotionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB729EF5019308A9231271F1 /* NotionService.swift */; };
+		F8EA2700D4452B2062FC3DFB /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84A54CBBCE88BE42422F4DA /* WatchConnectivityManager.swift */; };
+		FB79099BAC56147BCDEFDF67 /* PipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5AA45E9C7380C1DDA3BD78 /* PipelineTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		007EE63CC552012E6899734B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 23A4D517EFF7BBB436015015 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 93925FE1332EBFAECA7D5036;
+			remoteInfo = Talks;
+		};
+		B6BC4651850843EB78DAFA6B /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 23A4D517EFF7BBB436015015 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6F1256B2CD0FF80FB63AD188;
+			remoteInfo = TalksWatch;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		7AE2E430B6A2BF3ED9A64668 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				5FEA8A7887A0D09CAFE1480A /* TalksWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		03E5AB14723F1391EE4FFEF9 /* PhoneConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhoneConnectivityManager.swift; sourceTree = "<group>"; };
+		1A0E2E74AE67EF347F5B7431 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		1CE5AA72510F0324AEB64196 /* TranscriptionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionService.swift; sourceTree = "<group>"; };
+		275B1A8B87F3E24EA790AA60 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		43C92E23F2B1DE45B1CFFD9C /* TalksWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TalksWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4727D36B291A4FAE3937F489 /* MeetingAIService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingAIService.swift; sourceTree = "<group>"; };
+		4760009CCACC7B17B32203A3 /* WatchContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchContentView.swift; sourceTree = "<group>"; };
+		4D81CAE1B4FC7EDA341A5AF3 /* TalksWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalksWatchApp.swift; sourceTree = "<group>"; };
+		5915B39C7BB6349E0128057F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		809309766F857BF57856147C /* SyntheticPipelineRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyntheticPipelineRunner.swift; sourceTree = "<group>"; };
+		82176A50A5F460BF02F248CF /* TalksConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalksConstants.swift; sourceTree = "<group>"; };
+		847EB41DB3E3F09F39F5DDA0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		87DCAC66E7BD4490E053E6A3 /* TalksTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = TalksTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		9B7D1480EED55341A839BECA /* PipelineLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineLogger.swift; sourceTree = "<group>"; };
+		9DA119D99FE3FC7C48591E84 /* Talks.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Talks.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		9FF22A842D4E55B0CE23620E /* TalkDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalkDetailView.swift; sourceTree = "<group>"; };
+		A25CD73856F5201AEE388533 /* MeetingModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeetingModels.swift; sourceTree = "<group>"; };
+		A783725BC3DEC49D0564867A /* JobQueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobQueueManager.swift; sourceTree = "<group>"; };
+		B0B7F3660F66AA3B9880800D /* WatchRecordingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRecordingManager.swift; sourceTree = "<group>"; };
+		B84A54CBBCE88BE42422F4DA /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
+		BF5AA45E9C7380C1DDA3BD78 /* PipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineTests.swift; sourceTree = "<group>"; };
+		BF5E5F1907633303BCF9021E /* TalksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalksApp.swift; sourceTree = "<group>"; };
+		E2699FEAA95D0287E4162A15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E44A5EF95FDE50FEFD9BC525 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		EB729EF5019308A9231271F1 /* NotionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionService.swift; sourceTree = "<group>"; };
+		EF8E942E367BCEEF7087F8A0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		151B28927AA0EAE6797C52F9 /* TalksWatch */ = {
+			isa = PBXGroup;
+			children = (
+				BD6DC17CF886A1E0EF2222C2 /* Resources */,
+				AC02D41FDBAD41DF6FD3DAAD /* Sources */,
+			);
+			path = TalksWatch;
+			sourceTree = "<group>";
+		};
+		1A83A3D79F6581A074466DB0 /* Talks */ = {
+			isa = PBXGroup;
+			children = (
+				58535558EF443BE4B6A781A1 /* Resources */,
+				74E401B428EE6846703702C1 /* Sources */,
+			);
+			path = Talks;
+			sourceTree = "<group>";
+		};
+		58535558EF443BE4B6A781A1 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				EF8E942E367BCEEF7087F8A0 /* Assets.xcassets */,
+				5915B39C7BB6349E0128057F /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		6038BABE4EFB003D926FE37C /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9DA119D99FE3FC7C48591E84 /* Talks.app */,
+				87DCAC66E7BD4490E053E6A3 /* TalksTests.xctest */,
+				43C92E23F2B1DE45B1CFFD9C /* TalksWatch.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		715773B49397AFA3D1EF06AF = {
+			isa = PBXGroup;
+			children = (
+				1A83A3D79F6581A074466DB0 /* Talks */,
+				A934E525BA5C5C3965899B5B /* TalksShared */,
+				8C9FDB1F4E90F8E65FD6444D /* TalksTests */,
+				151B28927AA0EAE6797C52F9 /* TalksWatch */,
+				6038BABE4EFB003D926FE37C /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		74E401B428EE6846703702C1 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				847EB41DB3E3F09F39F5DDA0 /* ContentView.swift */,
+				A783725BC3DEC49D0564867A /* JobQueueManager.swift */,
+				E44A5EF95FDE50FEFD9BC525 /* KeychainHelper.swift */,
+				4727D36B291A4FAE3937F489 /* MeetingAIService.swift */,
+				EB729EF5019308A9231271F1 /* NotionService.swift */,
+				03E5AB14723F1391EE4FFEF9 /* PhoneConnectivityManager.swift */,
+				1A0E2E74AE67EF347F5B7431 /* SettingsView.swift */,
+				809309766F857BF57856147C /* SyntheticPipelineRunner.swift */,
+				9FF22A842D4E55B0CE23620E /* TalkDetailView.swift */,
+				BF5E5F1907633303BCF9021E /* TalksApp.swift */,
+				1CE5AA72510F0324AEB64196 /* TranscriptionService.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		8C9FDB1F4E90F8E65FD6444D /* TalksTests */ = {
+			isa = PBXGroup;
+			children = (
+				BF5AA45E9C7380C1DDA3BD78 /* PipelineTests.swift */,
+			);
+			path = TalksTests;
+			sourceTree = "<group>";
+		};
+		A934E525BA5C5C3965899B5B /* TalksShared */ = {
+			isa = PBXGroup;
+			children = (
+				A25CD73856F5201AEE388533 /* MeetingModels.swift */,
+				9B7D1480EED55341A839BECA /* PipelineLogger.swift */,
+				82176A50A5F460BF02F248CF /* TalksConstants.swift */,
+			);
+			path = TalksShared;
+			sourceTree = "<group>";
+		};
+		AC02D41FDBAD41DF6FD3DAAD /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				4D81CAE1B4FC7EDA341A5AF3 /* TalksWatchApp.swift */,
+				B84A54CBBCE88BE42422F4DA /* WatchConnectivityManager.swift */,
+				4760009CCACC7B17B32203A3 /* WatchContentView.swift */,
+				B0B7F3660F66AA3B9880800D /* WatchRecordingManager.swift */,
+			);
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		BD6DC17CF886A1E0EF2222C2 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				E2699FEAA95D0287E4162A15 /* Assets.xcassets */,
+				275B1A8B87F3E24EA790AA60 /* Info.plist */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		5CEE6E686A5CF04A88C5E487 /* TalksTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BF92E4458A76B0EF92A0AA08 /* Build configuration list for PBXNativeTarget "TalksTests" */;
+			buildPhases = (
+				58E1DB9ABA2FC245CBB5087A /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9C663BF6F8329C4ABE02EBD0 /* PBXTargetDependency */,
+			);
+			name = TalksTests;
+			packageProductDependencies = (
+			);
+			productName = TalksTests;
+			productReference = 87DCAC66E7BD4490E053E6A3 /* TalksTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		6F1256B2CD0FF80FB63AD188 /* TalksWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 6998EDC517185A52346B1E9C /* Build configuration list for PBXNativeTarget "TalksWatch" */;
+			buildPhases = (
+				8EEF0D88657E29DFD912A5A8 /* Sources */,
+				E80B9B62CBD64CE46C4A42C5 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TalksWatch;
+			packageProductDependencies = (
+			);
+			productName = TalksWatch;
+			productReference = 43C92E23F2B1DE45B1CFFD9C /* TalksWatch.app */;
+			productType = "com.apple.product-type.application";
+		};
+		93925FE1332EBFAECA7D5036 /* Talks */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78E0B14819A39E4A1D127722 /* Build configuration list for PBXNativeTarget "Talks" */;
+			buildPhases = (
+				F7BAAC1A41CDB065AC832234 /* Sources */,
+				F31959E5C29008CDE2D68C45 /* Resources */,
+				7AE2E430B6A2BF3ED9A64668 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				3E4A399D3FF964679C98C15A /* PBXTargetDependency */,
+			);
+			name = Talks;
+			packageProductDependencies = (
+			);
+			productName = Talks;
+			productReference = 9DA119D99FE3FC7C48591E84 /* Talks.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		23A4D517EFF7BBB436015015 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+					6F1256B2CD0FF80FB63AD188 = {
+						ProvisioningStyle = Automatic;
+					};
+					93925FE1332EBFAECA7D5036 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 9C0CDF727552E77526295395 /* Build configuration list for PBXProject "Talks" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 715773B49397AFA3D1EF06AF;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 6038BABE4EFB003D926FE37C /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				93925FE1332EBFAECA7D5036 /* Talks */,
+				6F1256B2CD0FF80FB63AD188 /* TalksWatch */,
+				5CEE6E686A5CF04A88C5E487 /* TalksTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		E80B9B62CBD64CE46C4A42C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CC624F1537BAE3AE81E24E8B /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F31959E5C29008CDE2D68C45 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D523913A24F549FDA21C8F24 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		58E1DB9ABA2FC245CBB5087A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FB79099BAC56147BCDEFDF67 /* PipelineTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8EEF0D88657E29DFD912A5A8 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4754CE8C5E8B501176AC9B21 /* MeetingModels.swift in Sources */,
+				9BCE172288A4C01E01F81B35 /* PipelineLogger.swift in Sources */,
+				D3013DC9C7E369B19ABB5127 /* TalksConstants.swift in Sources */,
+				119447702D28993C96C0ADA1 /* TalksWatchApp.swift in Sources */,
+				F8EA2700D4452B2062FC3DFB /* WatchConnectivityManager.swift in Sources */,
+				EA3FD7EE814C5A0637E19242 /* WatchContentView.swift in Sources */,
+				F0AA604C31BFB2B62DCF03DE /* WatchRecordingManager.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F7BAAC1A41CDB065AC832234 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E2FAE00CD3176EF9B984806E /* ContentView.swift in Sources */,
+				E5AB03808867BF2D82832FDD /* JobQueueManager.swift in Sources */,
+				AC10FF25D29A9FE6F0BEE8FA /* KeychainHelper.swift in Sources */,
+				333609B475BD3968B58E9EF6 /* MeetingAIService.swift in Sources */,
+				555408C56ED52074D73693B0 /* MeetingModels.swift in Sources */,
+				F21623003326F4642AAC3B86 /* NotionService.swift in Sources */,
+				C37ACA686A3294BFB03AF8BC /* PhoneConnectivityManager.swift in Sources */,
+				B31D548E75ED8ABF93F169CC /* PipelineLogger.swift in Sources */,
+				DAE328A736A15C4D14D16E74 /* SettingsView.swift in Sources */,
+				1429937010AD66A023CBCC83 /* SyntheticPipelineRunner.swift in Sources */,
+				1EC6B80B0E176E63991C722B /* TalkDetailView.swift in Sources */,
+				64481FAE16B71425A102BE63 /* TalksApp.swift in Sources */,
+				C1FC7AF47FAA7683ED674C1F /* TalksConstants.swift in Sources */,
+				A90C085C2DC5A832FB3409FB /* TranscriptionService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		3E4A399D3FF964679C98C15A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6F1256B2CD0FF80FB63AD188 /* TalksWatch */;
+			targetProxy = B6BC4651850843EB78DAFA6B /* PBXContainerItemProxy */;
+		};
+		9C663BF6F8329C4ABE02EBD0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 93925FE1332EBFAECA7D5036 /* Talks */;
+			targetProxy = 007EE63CC552012E6899734B /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0D2D2BFE405D542198A2C4DE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.personal.talkstests;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Talks.app/Talks";
+			};
+			name = Debug;
+		};
+		19DE35EAB24AB7071886872E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Talks/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.personal.talks;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		5E16604B75386FD18FD28C3B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TalksWatch/Resources/Info.plist;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.personal.talks.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Debug;
+		};
+		64BB3FA867AF6079562A5752 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = TalksWatch/Resources/Info.plist;
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.personal.talks.watchkitapp;
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 11.0;
+			};
+			name = Release;
+		};
+		74271BA36CD6DA0F5EF8DE03 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.personal.talkstests;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Talks.app/Talks";
+			};
+			name = Release;
+		};
+		ABDA0453ADC22EBEDA8D3CD6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		D26B1682D44233E624E05E77 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Talks/Resources/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.personal.talks;
+				SDKROOT = iphoneos;
+				SWIFT_STRICT_CONCURRENCY = complete;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D51524A868B3089C0D4BAC43 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		6998EDC517185A52346B1E9C /* Build configuration list for PBXNativeTarget "TalksWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5E16604B75386FD18FD28C3B /* Debug */,
+				64BB3FA867AF6079562A5752 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		78E0B14819A39E4A1D127722 /* Build configuration list for PBXNativeTarget "Talks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D26B1682D44233E624E05E77 /* Debug */,
+				19DE35EAB24AB7071886872E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		9C0CDF727552E77526295395 /* Build configuration list for PBXProject "Talks" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ABDA0453ADC22EBEDA8D3CD6 /* Debug */,
+				D51524A868B3089C0D4BAC43 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		BF92E4458A76B0EF92A0AA08 /* Build configuration list for PBXNativeTarget "TalksTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0D2D2BFE405D542198A2C4DE /* Debug */,
+				74271BA36CD6DA0F5EF8DE03 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 23A4D517EFF7BBB436015015 /* Project object */;
+}

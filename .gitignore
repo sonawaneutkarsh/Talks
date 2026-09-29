@@ -1,0 +1,23 @@
+# OS & IDE
+.DS_Store
+DerivedData/
+build/
+.build/
+*.xcworkspace
+xcuserdata/
+*.xcuserdatad
+*.xcuserstate
+*.xccheckout
+*.xcscmblueprint
+*.log
+*.ips
+
+# Local Audio & Test Recordings
+*.m4a
+*.wav
+*Recordings/
+
+# Local Config & Secrets
+*.env
+*.secrets
+secrets.json
