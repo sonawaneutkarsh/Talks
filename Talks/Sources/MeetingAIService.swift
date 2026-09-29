@@ -5,8 +5,8 @@ import FoundationModels
 // 1. Zero Cloud: Formatting uses Apple's Foundation Models on device.
 // 2. Structured Extraction: Generates Title, Summary, Key Points, Decisions, Action Items,
 //    and Follow-Ups using schema-guided generation (@Generable).
-// 3. Graceful Fallback: On devices without Apple Intelligence enabled, an intelligent
-//    heuristic local rule-based extractor provides clean structured output without crashing.
+// 3. Availability Handling: On devices without Apple Intelligence enabled (or running iOS < 26),
+//    JobQueueManager pauses the job at .waitingForAI until Apple Intelligence becomes available.
 
 public enum MeetingAIError: LocalizedError {
     case appleIntelligenceUnavailable(String)

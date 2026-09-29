@@ -66,11 +66,13 @@
 
 ## Requirements
 
-- **iPhone**: iOS 18.0 or later (minimum OS required to launch Talks, ingest transfers, transcribe locally via SFSpeechRecognizer, and sync with Notion).
+- **iPhone**: iOS 18.0 or later (minimum OS required to launch Talks, ingest background Watch audio transfers, and transcribe audio locally).
 - **Apple Watch**: Any Apple Watch capable of running watchOS 11.0 or later.
 - **Xcode**: Xcode 26.0 or later (Xcode 27.0 with Swift 6 and iOS 26+ SDK required to compile FoundationModels).
-- **Apple Intelligence**: Requires an Apple Intelligence-compatible device (iPhone 15 Pro, iPhone 16 series, or newer) running iOS 26.0 or later with Apple Intelligence enabled in Settings; devices running iOS 18–25 or without Apple Intelligence capture audio and transcribe on-device via SFSpeechRecognizer.
-- **Notion Integration**: Free Notion Internal Integration Token and parent page ID with integration connection access.
+- **Supported Workflows by OS & Hardware**:
+  - **iOS 26+ with Apple Intelligence** (iPhone 15 Pro, iPhone 16 series, or newer with Apple Intelligence enabled): Full automated end-to-end pipeline — Watch recording → background transfer → on-device `SpeechAnalyzer` transcription → on-device Foundation Models AI structuring → automatic Notion upload.
+  - **iOS 18–25 or Apple Intelligence Unavailable**: Audio recording, background transfer, and local on-device transcription (via `SFSpeechRecognizer`) execute completely. The job queue then pauses at `.waitingForAI`; AI formatting and automatic structured Notion completion wait until Apple Intelligence becomes available (or until the queue is processed on an Apple Intelligence-capable device).
+- **Notion Integration**: Free Notion Internal Integration Token and parent page ID with integration connection access (required for the Notion upload stage).
 
 ---
 
@@ -100,6 +102,11 @@ cd Talks
    - Tap **Save Credentials to Keychain**.
    - Tap **Test Connection & Sync 'Talks' Page** to verify setup.
 6. Switch schemes to `TalksWatch`, select your physical Apple Watch, and build & run.
+
+### Using Talks on Your Own Apple Developer Account
+When building Talks for personal devices:
+1. **Choose Signing Team**: In Xcode, open `Talks.xcodeproj`. Under **Signing & Capabilities**, select your personal or organization Apple Developer Team for both the `Talks` (iOS) and `TalksWatch` (watchOS) targets.
+2. **Unique Bundle Identifiers**: If the default bundle identifiers (`com.personal.talks` and `com.personal.talks.watchkitapp`) conflict with existing App IDs on your developer account, change them to your own unique prefix (e.g. `com.yourname.talks` and `com.yourname.talks.watchkitapp`). Ensure you preserve the Watch companion relationship: the Watch app's bundle ID must be prefixed with the iOS app's bundle ID (e.g., `<iOS-Bundle-ID>.watchkitapp`). You can also configure this prefix in `project.yml` under `bundleIdPrefix` and run `xcodegen generate`.
 
 ---
 
