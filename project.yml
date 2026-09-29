@@ -2,7 +2,6 @@ name: Talks
 options:
   bundleIdPrefix: com.personal
   createIntermediateGroups: true
-  xcodeVersion: "16.0"
 
 settings:
   SWIFT_VERSION: "6.0"

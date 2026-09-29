@@ -7,8 +7,9 @@ import AVFoundation
 // 2. Cancellation-Resistant Watchdog: SpeechAnalyzer operations run within isolated tasks
 //    governed by TaskTimeoutWatchdog. If an analyzer operation hangs during finalization,
 //    the watchdog escapes immediately and triggers full audio transcription via the fallback engine.
-// 3. Dual-Engine Fallback: Primary engine is modern SpeechAnalyzer (iOS 18+). If assets are
-//    missing or execution times out, SFSpeechRecognizer on-device engine completes the work.
+// 3. Dual-Engine Fallback: Primary engine is modern SpeechAnalyzer under #available(iOS 26.0, *).
+//    On older supported iOS versions, or if assets are missing / execution times out, the
+//    SFSpeechRecognizer on-device engine completes the work.
 
 public enum TranscriptionError: LocalizedError {
     case speechRecognitionUnavailable

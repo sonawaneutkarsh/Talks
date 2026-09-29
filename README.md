@@ -1,6 +1,6 @@
 # Talks
 
-> Distraction-free, zero-cloud meeting capture for Apple Watch and iPhone with on-device intelligence and direct Notion synchronization.
+> Distraction-free meeting capture for Apple Watch and iPhone with on-device intelligence and direct Notion synchronization.
 
 ---
 
@@ -8,8 +8,8 @@
 
 **Talks** is an open-source, private-by-design meeting recording and synthesis system designed specifically for professors, researchers, and engineers. It captures meetings directly from your Apple Watch, safely transfers the audio to your iPhone over background channels, transcribes and structures the meeting using Apple's on-device foundation models, and creates an organized, beautifully formatted summary in your Notion workspace.
 
-- **Zero Cloud Processing**: Audio and transcripts never touch any third-party AI or transcription servers. Everything executes 100% locally on your iPhone using Apple Silicon hardware acceleration.
-- **$0 / Month Recurring Cost**: No API keys for speech-to-text or large language models. Direct integration with the free Notion API.
+- **No Cloud AI Processing**: Audio and transcripts never touch third-party AI or speech servers. Transcription and synthesis execute locally on your iPhone using Apple Silicon hardware acceleration, before finalized notes are uploaded directly to your own Notion workspace.
+- **No Recurring Subscription or API Costs**: No paid API keys for speech-to-text or large language models. Direct integration with the standard Notion API.
 - **Distraction-Free**: Includes an academic "Screen Off" mode that blanks the watch face during research meetings while maintaining continuous recording.
 
 ---
@@ -36,8 +36,8 @@
          │ 6. Enqueue durable job in JobQueueManager
          │
          ├───▶ [7. On-Device Speech Transcription]
-         │     • SpeechAnalyzer (iOS 18+) with streaming watchdog
-         │     • Automatic SFSpeechRecognizer on-device fallback
+         │     • SpeechAnalyzer (#available(iOS 26.0, *)) with streaming watchdog
+         │     • On-device SFSpeechRecognizer fallback on older supported iOS versions
          │
          ├───▶ [8. Apple Intelligence Structuring]
          │     • Foundation Models (System LLM)
@@ -56,7 +56,7 @@
 - **One-Tap Apple Watch Recording**: Large, high-contrast record button with haptic feedback.
 - **Screen Off Distraction-Free Mode**: Tap "Screen Off" during meetings to blank the watch display (`Color.black`) with a subtle, non-intrusive corner indicator. Safe wake-on-tap returns to controls without interrupting the recording.
 - **Durable Background Transfer**: Transfers audio out-of-process via `WCSession.transferFile`. Audio on the Watch is only deleted after the iPhone sends a verified acknowledgement.
-- **100% On-Device Speech Transcription**: Leverages Apple's Speech framework (`SpeechAnalyzer` with on-device asset models, backed by `SFSpeechRecognizer` fallback with cancellation-resistant watchdog isolation).
+- **On-Device Speech Transcription**: Leverages Apple's Speech framework (`SpeechAnalyzer` under `#available(iOS 26.0, *)`, backed by an on-device `SFSpeechRecognizer` fallback on older supported iOS versions with cancellation-resistant watchdog isolation).
 - **Apple Intelligence Structuring**: Extracts meeting titles, summaries, key takeaways, agreed decisions, and action items directly on device.
 - **Direct Notion Sync**: Formats notes with native Notion callout, heading, bullet, and todo blocks. Retains full raw transcripts in an expandable toggle block.
 - **Safe Local Swipe Deletion**: Swipe left on any completed or failed Talk to delete the local recording and metadata from iPhone. Active processing jobs are strictly protected, and external Notion pages are never deleted.
@@ -67,7 +67,7 @@
 ## Requirements
 
 - **iPhone**: iOS 18.0 or later (minimum OS required to launch Talks, ingest transfers, transcribe locally via SFSpeechRecognizer, and sync with Notion).
-- **Apple Watch**: watchOS 11.0 or later (Apple Watch Series 8, Ultra, or newer).
+- **Apple Watch**: Any Apple Watch capable of running watchOS 11.0 or later.
 - **Xcode**: Xcode 26.0 or later (Xcode 27.0 with Swift 6 and iOS 26+ SDK required to compile FoundationModels).
 - **Apple Intelligence**: Requires an Apple Intelligence-compatible device (iPhone 15 Pro, iPhone 16 series, or newer) running iOS 26.0 or later with Apple Intelligence enabled in Settings; devices running iOS 18–25 or without Apple Intelligence capture audio and transcribe on-device via SFSpeechRecognizer.
 - **Notion Integration**: Free Notion Internal Integration Token and parent page ID with integration connection access.
@@ -78,13 +78,13 @@
 
 ### Step 1: Clone the Repository
 ```bash
-git clone https://github.com/your-username/talks.git
-cd talks
+git clone https://github.com/sonawaneutkarsh/Talks.git
+cd Talks
 ```
 
 ### Step 2: Configure Notion Integration
 1. Go to [Notion Developers](https://www.notion.so/my-integrations) and create a **New integration**.
-2. Give it a name (e.g. `Talks Assistant`) and copy the **Internal Integration Secret** (`secret_...`).
+2. Give it a name (e.g. `Talks Assistant`) and copy the **Internal Integration Token**.
 3. Open Notion in your browser, create or navigate to a page where you want meeting notes stored (e.g., `Research Notes` or `Meetings`).
 4. Click the `...` menu in the upper-right corner of the parent page, select **Connections**, and connect your integration.
 5. Copy the parent page link or page ID (the 32-character hexadecimal string in the page URL).
@@ -122,13 +122,13 @@ cd talks
 
 ## 7. Architecture & Design Decisions
 
-### Why 100% On-Device?
-- **Academic & Research Confidentiality**: Meeting discussions with collaborators, students, and industry partners often involve unpublished data, intellectual property, or confidential disclosures. Zero third-party cloud audio processing guarantees absolute privacy.
-- **Zero API Bills**: Cloud LLM and STT APIs charge per minute and per token. By running transcription and formatting on device, Talks is completely free forever.
+### Why On-Device AI Processing?
+- **Academic & Research Confidentiality**: Meeting discussions with collaborators, students, and industry partners often involve unpublished data, intellectual property, or confidential disclosures. Keeping audio transcription and AI structuring entirely local prevents exposing sensitive meeting discussions to third-party AI cloud services.
+- **Zero Ongoing AI Costs**: Commercial LLM and STT APIs charge recurring fees per minute and per token. By running speech recognition and note structuring locally on Apple Silicon, Talks requires no third-party AI subscription or per-meeting API costs.
 
 ### Why Background Transfers vs. Live Streaming?
 - Live streaming audio over Bluetooth during a 90-minute lecture drains watch battery and is prone to packet loss if you step away from your phone.
-- Recording locally to high-efficiency AAC (`.m4a`) and performing atomic file transfers over `wcd` guarantees zero dropped frames and rock-solid battery efficiency.
+- Recording locally to high-efficiency AAC (`.m4a`) and performing background file transfers over `wcd` significantly reduces dropped audio segments from wireless dropouts and preserves battery efficiency.
 
 ### Crash & Force-Quit Resilience
 - State transitions are recorded in a persistent, atomic JSON job queue (`Documents/job_queue.json`).
