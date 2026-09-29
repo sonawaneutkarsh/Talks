@@ -71,7 +71,7 @@
 - **Xcode**: Xcode 26.0 or later (Xcode 27.0 with Swift 6 and iOS 26+ SDK required to compile FoundationModels).
 - **Supported Workflows by OS & Hardware**:
   - **iOS 26+ with Apple Intelligence** (iPhone 15 Pro, iPhone 16 series, or newer with Apple Intelligence enabled): Full automated end-to-end pipeline — Watch recording → background transfer → on-device `SpeechAnalyzer` transcription → on-device Foundation Models AI structuring → automatic Notion upload.
-  - **iOS 18–25 or Apple Intelligence Unavailable**: Audio recording, background transfer, and local on-device transcription (via `SFSpeechRecognizer`) execute completely. The job queue then pauses at `.waitingForAI`; AI formatting and automatic structured Notion completion wait until Apple Intelligence becomes available (or until the queue is processed on an Apple Intelligence-capable device).
+  - **iOS 18–25 or Apple Intelligence unavailable**: Recording, background transfer, and on-device transcription work normally. The job then remains at .waitingForAI until Apple Intelligence becomes available on that device, such as after upgrading to a supported OS on compatible hardware.
 - **Notion Integration**: Free Notion Internal Integration Token and parent page ID with integration connection access (required for the Notion upload stage).
 
 ---
