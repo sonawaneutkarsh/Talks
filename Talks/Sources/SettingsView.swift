@@ -314,10 +314,10 @@ public struct SettingsView: View {
     
     private func loadCredentials() {
         Task {
-            if let token = await NotionService.shared.getApiKey() {
+            if let token = NotionService.shared.getApiKey() {
                 self.apiKey = token
             }
-            if let parent = await NotionService.shared.getParentPageId() {
+            if let parent = NotionService.shared.getParentPageId() {
                 self.parentPageId = parent
             }
         }
@@ -332,8 +332,8 @@ public struct SettingsView: View {
     
     private func saveNotionCredentials() {
         Task {
-            await NotionService.shared.setApiKey(apiKey)
-            await NotionService.shared.setParentPageId(parentPageId)
+            NotionService.shared.setApiKey(apiKey)
+            NotionService.shared.setParentPageId(parentPageId)
             notionStatusMessage = "Credentials saved to Keychain ✓"
             notionStatusColor = .green
         }

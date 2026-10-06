@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7C1A2B3C4D5E6F7081920A1C /* WatchTransferLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1A2B3C4D5E6F7081920A1B /* WatchTransferLedger.swift */; };
+		7C1A2B3C4D5E6F7081920A1D /* WatchTransferLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C1A2B3C4D5E6F7081920A1B /* WatchTransferLedger.swift */; };
 		119447702D28993C96C0ADA1 /* TalksWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D81CAE1B4FC7EDA341A5AF3 /* TalksWatchApp.swift */; };
 		1429937010AD66A023CBCC83 /* SyntheticPipelineRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 809309766F857BF57856147C /* SyntheticPipelineRunner.swift */; };
 		1EC6B80B0E176E63991C722B /* TalkDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9FF22A842D4E55B0CE23620E /* TalkDetailView.swift */; };
@@ -31,7 +33,11 @@
 		F0AA604C31BFB2B62DCF03DE /* WatchRecordingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0B7F3660F66AA3B9880800D /* WatchRecordingManager.swift */; };
 		F21623003326F4642AAC3B86 /* NotionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB729EF5019308A9231271F1 /* NotionService.swift */; };
 		F8EA2700D4452B2062FC3DFB /* WatchConnectivityManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B84A54CBBCE88BE42422F4DA /* WatchConnectivityManager.swift */; };
-		FB79099BAC56147BCDEFDF67 /* PipelineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF5AA45E9C7380C1DDA3BD78 /* PipelineTests.swift */; };
+		7D2B3C4D5E6F708192A3C500 /* TestSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2B3C4D5E6F708192A3B400 /* TestSupport.swift */; };
+		7D2B3C4D5E6F708192A3C501 /* NotionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2B3C4D5E6F708192A3B401 /* NotionServiceTests.swift */; };
+		7D2B3C4D5E6F708192A3C502 /* JobQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2B3C4D5E6F708192A3B402 /* JobQueueTests.swift */; };
+		7D2B3C4D5E6F708192A3C503 /* TranscriptionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2B3C4D5E6F708192A3B403 /* TranscriptionTests.swift */; };
+		7D2B3C4D5E6F708192A3C504 /* ConnectivityAndLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D2B3C4D5E6F708192A3B404 /* ConnectivityAndLaunchTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -86,12 +92,17 @@
 		A783725BC3DEC49D0564867A /* JobQueueManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobQueueManager.swift; sourceTree = "<group>"; };
 		B0B7F3660F66AA3B9880800D /* WatchRecordingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchRecordingManager.swift; sourceTree = "<group>"; };
 		B84A54CBBCE88BE42422F4DA /* WatchConnectivityManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchConnectivityManager.swift; sourceTree = "<group>"; };
-		BF5AA45E9C7380C1DDA3BD78 /* PipelineTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PipelineTests.swift; sourceTree = "<group>"; };
+		7D2B3C4D5E6F708192A3B400 /* TestSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSupport.swift; sourceTree = "<group>"; };
+		7D2B3C4D5E6F708192A3B401 /* NotionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionServiceTests.swift; sourceTree = "<group>"; };
+		7D2B3C4D5E6F708192A3B402 /* JobQueueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JobQueueTests.swift; sourceTree = "<group>"; };
+		7D2B3C4D5E6F708192A3B403 /* TranscriptionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranscriptionTests.swift; sourceTree = "<group>"; };
+		7D2B3C4D5E6F708192A3B404 /* ConnectivityAndLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectivityAndLaunchTests.swift; sourceTree = "<group>"; };
 		BF5E5F1907633303BCF9021E /* TalksApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TalksApp.swift; sourceTree = "<group>"; };
 		E2699FEAA95D0287E4162A15 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		E44A5EF95FDE50FEFD9BC525 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
 		EB729EF5019308A9231271F1 /* NotionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotionService.swift; sourceTree = "<group>"; };
 		EF8E942E367BCEEF7087F8A0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		7C1A2B3C4D5E6F7081920A1B /* WatchTransferLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchTransferLedger.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -164,7 +175,11 @@
 		8C9FDB1F4E90F8E65FD6444D /* TalksTests */ = {
 			isa = PBXGroup;
 			children = (
-				BF5AA45E9C7380C1DDA3BD78 /* PipelineTests.swift */,
+				7D2B3C4D5E6F708192A3B400 /* TestSupport.swift */,
+				7D2B3C4D5E6F708192A3B401 /* NotionServiceTests.swift */,
+				7D2B3C4D5E6F708192A3B402 /* JobQueueTests.swift */,
+				7D2B3C4D5E6F708192A3B403 /* TranscriptionTests.swift */,
+				7D2B3C4D5E6F708192A3B404 /* ConnectivityAndLaunchTests.swift */,
 			);
 			path = TalksTests;
 			sourceTree = "<group>";
@@ -174,6 +189,7 @@
 			children = (
 				A25CD73856F5201AEE388533 /* MeetingModels.swift */,
 				9B7D1480EED55341A839BECA /* PipelineLogger.swift */,
+				7C1A2B3C4D5E6F7081920A1B /* WatchTransferLedger.swift */,
 				82176A50A5F460BF02F248CF /* TalksConstants.swift */,
 			);
 			path = TalksShared;
@@ -320,7 +336,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FB79099BAC56147BCDEFDF67 /* PipelineTests.swift in Sources */,
+				7D2B3C4D5E6F708192A3C500 /* TestSupport.swift in Sources */,
+				7D2B3C4D5E6F708192A3C501 /* NotionServiceTests.swift in Sources */,
+				7D2B3C4D5E6F708192A3C502 /* JobQueueTests.swift in Sources */,
+				7D2B3C4D5E6F708192A3C503 /* TranscriptionTests.swift in Sources */,
+				7D2B3C4D5E6F708192A3C504 /* ConnectivityAndLaunchTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -329,6 +349,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4754CE8C5E8B501176AC9B21 /* MeetingModels.swift in Sources */,
+				7C1A2B3C4D5E6F7081920A1C /* WatchTransferLedger.swift in Sources */,
 				9BCE172288A4C01E01F81B35 /* PipelineLogger.swift in Sources */,
 				D3013DC9C7E369B19ABB5127 /* TalksConstants.swift in Sources */,
 				119447702D28993C96C0ADA1 /* TalksWatchApp.swift in Sources */,
@@ -347,6 +368,7 @@
 				AC10FF25D29A9FE6F0BEE8FA /* KeychainHelper.swift in Sources */,
 				333609B475BD3968B58E9EF6 /* MeetingAIService.swift in Sources */,
 				555408C56ED52074D73693B0 /* MeetingModels.swift in Sources */,
+				7C1A2B3C4D5E6F7081920A1D /* WatchTransferLedger.swift in Sources */,
 				F21623003326F4642AAC3B86 /* NotionService.swift in Sources */,
 				C37ACA686A3294BFB03AF8BC /* PhoneConnectivityManager.swift in Sources */,
 				B31D548E75ED8ABF93F169CC /* PipelineLogger.swift in Sources */,

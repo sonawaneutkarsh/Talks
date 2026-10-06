@@ -54,7 +54,7 @@ public struct ConsolidatedSummaryOutput {
 @available(iOS 26.0, *)
 @Generable
 public struct GeneratedTitle {
-    @Guide(description: "A short, descriptive 3-6 word title for the meeting (e.g. 'Nahian — ADR Research Planning' or 'Office Hours — Vector Fields'). Do not include dates.")
+    @Guide(description: "A short, descriptive 3-6 word title for the meeting (e.g. 'Advisor — ADR Research Planning' or 'Office Hours — Vector Fields'). Do not include dates.")
     public var title: String
 }
 
@@ -333,7 +333,7 @@ public actor MeetingAIService {
         
         let fallbackTitle = "Talk — \(dateString)"
         
-        let instructions = "Generate a short, concise, descriptive title (3-6 words) for the meeting based on the main participants, course, or topic discussed (e.g. 'Nahian — ADR Research Planning' or 'MATH 230H Office Hours — Vector Fields'). Do not include dates."
+        let instructions = "Generate a short, concise, descriptive title (3-6 words) for the meeting based on the main participants, course, or topic discussed (e.g. 'Advisor — ADR Research Planning' or 'MATH 230H Office Hours — Vector Fields'). Do not include dates."
         let session = LanguageModelSession(model: .default, instructions: instructions)
         let prefix = String(formattedTranscript.prefix(3000))
         let prompt = "Extract a short title for this meeting:\n\n\(prefix)"

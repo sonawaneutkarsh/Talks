@@ -27,15 +27,26 @@ public final class PhoneConnectivityManager: NSObject, ObservableObject {
     
     private var session: WCSession?
     private let recordingsDirectory: URL
+    private let queueManager: JobQueueManager
     
-    public override init() {
+    public override convenience init() {
+        self.init(queueManager: .shared, activateSession: true)
+    }
+    
+    /// - Parameters:
+    ///   - queueManager: Queue that receives incoming recordings.
+    ///   - activateSession: Activate `WCSession.default`. Unit tests pass `false` so no real
+    ///     WatchConnectivity session (and no paired-Watch state) is involved.
+    public init(queueManager: JobQueueManager, activateSession: Bool) {
         PipelineLogger.log(stage: "[LAUNCH] WCSession manager init ENTER")
-        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        self.recordingsDirectory = docs.appendingPathComponent("Recordings", isDirectory: true)
+        self.queueManager = queueManager
+        self.recordingsDirectory = queueManager.recordingsDirectory
         super.init()
         
         createRecordingsDirectoryIfNeeded()
-        setupWatchConnectivity()
+        if activateSession {
+            setupWatchConnectivity()
+        }
         PipelineLogger.log(stage: "[LAUNCH] WCSession manager init EXIT")
     }
     
@@ -169,7 +180,7 @@ public final class PhoneConnectivityManager: NSObject, ObservableObject {
         
         logEvent("Calling JobQueueManager.enqueueReceivedRecording for \(id.uuidString.prefix(8))...")
         // Persist and enqueue first
-        JobQueueManager.shared.enqueueReceivedRecording(
+        queueManager.enqueueReceivedRecording(
             id: id,
             createdAt: createdAt,
             duration: duration,

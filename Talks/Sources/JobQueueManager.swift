@@ -4,12 +4,60 @@ import BackgroundTasks
 import UIKit
 
 // MARK: - Architectural Invariant: Job Queue & Crash Recovery
-// 1. Durability: Every state transition is written atomically to Documents/job_queue.json.
+// 1. Durability: Every state transition is written atomically to Documents/queue.json.
 // 2. Crash Recovery: When the app launches or wakes via background tasks, any in-flight
 //    or interrupted jobs are automatically claimed, resumed, or recovered.
 // 3. Thread Safety: UIBackgroundTaskIdentifier expiration handlers execute immediately
 //    and synchronously via BackgroundTaskBox to protect against 0xbaadca11 watchdog kills.
 // 4. Processing Pipeline: received -> transcribing -> formatting -> uploadingToNotion -> completed.
+// 5. Testability: storage location and pipeline stages are injected (QueueDependencies), so unit
+//    tests run against a temporary directory and fake stages instead of the shared app state.
+
+/// The pipeline stages JobQueueManager calls. `.live` wires the real services; tests inject fakes.
+public struct QueueDependencies: Sendable {
+    public var transcribe: @Sendable (URL, UUID) async throws -> String
+    public var checkAIAvailability: @Sendable () async -> (Bool, String)
+    public var structureTranscript: @Sendable (String, Date, UUID) async throws -> (String, MeetingIntelligence, String)
+    public var notionCredentialsConfigured: @Sendable () async -> Bool
+    public var uploadToNotion: @Sendable (MeetingJob, @escaping @Sendable (String) -> Void) async throws -> (String, String)
+
+    public init(
+        transcribe: @escaping @Sendable (URL, UUID) async throws -> String,
+        checkAIAvailability: @escaping @Sendable () async -> (Bool, String),
+        structureTranscript: @escaping @Sendable (String, Date, UUID) async throws -> (String, MeetingIntelligence, String),
+        notionCredentialsConfigured: @escaping @Sendable () async -> Bool,
+        uploadToNotion: @escaping @Sendable (MeetingJob, @escaping @Sendable (String) -> Void) async throws -> (String, String)
+    ) {
+        self.transcribe = transcribe
+        self.checkAIAvailability = checkAIAvailability
+        self.structureTranscript = structureTranscript
+        self.notionCredentialsConfigured = notionCredentialsConfigured
+        self.uploadToNotion = uploadToNotion
+    }
+
+    public static let live = QueueDependencies(
+        transcribe: { url, jobId in
+            try await TranscriptionService.shared.transcribeAudioFile(at: url, jobId: jobId)
+        },
+        checkAIAvailability: {
+            let result = await MeetingAIService.shared.checkAvailability()
+            return (result.isAvailable, result.message)
+        },
+        structureTranscript: { raw, date, jobId in
+            let result = try await MeetingAIService.shared.processTranscript(rawTranscript: raw, date: date, jobId: jobId)
+            return (result.formattedTranscript, result.intelligence, result.title)
+        },
+        notionCredentialsConfigured: {
+            let token = NotionService.shared.getApiKey() ?? ""
+            let parent = NotionService.shared.getParentPageId() ?? ""
+            return !token.isEmpty && !parent.isEmpty
+        },
+        uploadToNotion: { job, onPageCreated in
+            let result = try await NotionService.shared.uploadMeeting(job: job, onPageCreated: onPageCreated)
+            return (result.pageId, result.pageUrl)
+        }
+    )
+}
 
 final class BackgroundTaskBox: @unchecked Sendable {
     private let lock = NSLock()
@@ -40,22 +88,38 @@ public final class JobQueueManager: ObservableObject {
     @Published public private(set) var isProcessing = false
     @Published public private(set) var activeProcessingJobId: UUID? = nil
     
-    private let queueFileURL: URL
+    public let queueFileURL: URL
     public let recordingsDirectory: URL
+    private let dependencies: QueueDependencies
+    /// When false (unit tests), the manager does not touch BGTaskScheduler, UIApplication background
+    /// tasks, or notification permissions, which are process-global and cannot be registered twice.
+    private let systemIntegration: Bool
     private var isQueueLoopActive = false
     private var activeProcessingTask: Task<Void, Never>?
     private var bgTaskRegistered = false
     
-    public init() {
+    /// - Parameters:
+    ///   - storageDirectory: Folder that holds `queue.json` and `Recordings/`. Defaults to the app's Documents folder.
+    ///   - dependencies: Pipeline stages. Defaults to the real transcription, Apple Intelligence, and Notion services.
+    ///   - systemIntegration: Register background tasks and notifications. Pass `false` in tests.
+    public init(
+        storageDirectory: URL? = nil,
+        dependencies: QueueDependencies = .live,
+        systemIntegration: Bool = true
+    ) {
         PipelineLogger.log(stage: "[LAUNCH] JobQueueManager init ENTER")
-        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        self.queueFileURL = docs.appendingPathComponent("queue.json")
-        self.recordingsDirectory = docs.appendingPathComponent("Recordings", isDirectory: true)
+        let base = storageDirectory ?? FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        self.queueFileURL = base.appendingPathComponent("queue.json")
+        self.recordingsDirectory = base.appendingPathComponent("Recordings", isDirectory: true)
+        self.dependencies = dependencies
+        self.systemIntegration = systemIntegration
         
         createRecordingsDirectoryIfNeeded()
         loadAndReconcileJobs()
-        requestNotificationPermission()
-        registerBackgroundTask()
+        if systemIntegration {
+            requestNotificationPermission()
+            registerBackgroundTask()
+        }
         // IMPORTANT ARCHITECTURAL INVARIANT:
         // Do NOT start heavy processing loop inside init()!
         // The UI must construct and render its first frame unimpeded.
@@ -144,8 +208,14 @@ public final class JobQueueManager: ObservableObject {
             self.activeProcessingJobId = nil
             saveJobs()
         } catch {
-            print("[JobQueueManager] Failed to load queue.json: \(error.localizedDescription)")
+            // Keep the unreadable file for diagnosis instead of overwriting it on the next save.
+            let backupURL = queueFileURL.deletingLastPathComponent()
+                .appendingPathComponent("queue.corrupt-\(Int(Date().timeIntervalSince1970)).json")
+            try? FileManager.default.removeItem(at: backupURL)
+            try? FileManager.default.moveItem(at: queueFileURL, to: backupURL)
+            PipelineLogger.log(stage: "queue load failed", details: "\(error.localizedDescription). Moved unreadable queue to \(backupURL.lastPathComponent)")
             self.jobs = []
+            self.activeProcessingJobId = nil
         }
     }
     
@@ -163,6 +233,7 @@ public final class JobQueueManager: ObservableObject {
     }
     
     private func notifySuccess(title: String) {
+        guard systemIntegration else { return }
         let content = UNMutableNotificationContent()
         content.title = "Talks"
         content.body = "\(title) — saved to Notion ✓"
@@ -185,6 +256,7 @@ public final class JobQueueManager: ObservableObject {
     }
     
     public func scheduleBackgroundProcessing() {
+        guard systemIntegration else { return }
         let request = BGProcessingTaskRequest(identifier: Self.bgProcessingTaskIdentifier)
         request.requiresNetworkConnectivity = true
         request.requiresExternalPower = false
@@ -204,11 +276,7 @@ public final class JobQueueManager: ObservableObject {
         task.expirationHandler = { [weak self] in
             PipelineLogger.log(stage: "BGProcessingTask expired", jobId: nil, details: "Cancelling in-flight operations safely")
             Task { @MainActor [weak self] in
-                self?.activeProcessingTask?.cancel()
-                self?.reconcileInterruptedActiveJob()
-                self?.isQueueLoopActive = false
-                self?.isProcessing = false
-                self?.activeProcessingJobId = nil
+                self?.handleBackgroundTimeExpiration()
             }
         }
         
@@ -255,23 +323,22 @@ public final class JobQueueManager: ObservableObject {
         isProcessing = true
         PipelineLogger.log(stage: "processNextJob entered", jobId: nil, details: "Starting processing loop.")
         
+        let useBackgroundTask = systemIntegration
         activeProcessingTask = Task { @MainActor in
             let box = BackgroundTaskBox()
-            let taskID = UIApplication.shared.beginBackgroundTask(withName: "TalksProcessing") { [weak self] in
-                PipelineLogger.log(stage: "UIBackgroundTask expired", jobId: nil)
-                let current = box.getAndClear()
-                if current != .invalid {
-                    UIApplication.shared.endBackgroundTask(current)
+            if useBackgroundTask {
+                let taskID = UIApplication.shared.beginBackgroundTask(withName: "TalksProcessing") { [weak self] in
+                    PipelineLogger.log(stage: "UIBackgroundTask expired", jobId: nil)
+                    let current = box.getAndClear()
+                    if current != .invalid {
+                        UIApplication.shared.endBackgroundTask(current)
+                    }
+                    Task { @MainActor [weak self] in
+                        self?.handleBackgroundTimeExpiration()
+                    }
                 }
-                Task { @MainActor [weak self] in
-                    self?.activeProcessingTask?.cancel()
-                    self?.reconcileInterruptedActiveJob()
-                    self?.isQueueLoopActive = false
-                    self?.isProcessing = false
-                    self?.activeProcessingJobId = nil
-                }
+                box.set(taskID)
             }
-            box.set(taskID)
             
             await self.runProcessingLoop()
             
@@ -284,6 +351,21 @@ public final class JobQueueManager: ObservableObject {
                 UIApplication.shared.endBackgroundTask(finalTaskID)
             }
         }
+    }
+    
+    /// Waits for the current processing loop (if any) to finish.
+    public func waitUntilIdle() async {
+        await activeProcessingTask?.value
+    }
+    
+    /// Called when iOS revokes background execution time: cancel in-flight work, put the
+    /// interrupted job back into a resumable state, and release the single-worker claim.
+    public func handleBackgroundTimeExpiration() {
+        activeProcessingTask?.cancel()
+        reconcileInterruptedActiveJob()
+        isQueueLoopActive = false
+        isProcessing = false
+        activeProcessingJobId = nil
     }
     
     // Backward-compatible alias
@@ -307,8 +389,10 @@ public final class JobQueueManager: ObservableObject {
         saveJobs()
     }
     
-    public func claimNextActionableJob() -> (index: Int, job: MeetingJob)? {
-        for (index, job) in jobs.enumerated() {
+    /// Claims the first actionable job that is not in `excluded` and makes it the single active job.
+    public func claimNextActionableJob(excluding excluded: Set<UUID> = []) -> (index: Int, job: MeetingJob)? {
+        guard activeProcessingJobId == nil else { return nil }
+        for (index, job) in jobs.enumerated() where !excluded.contains(job.id) {
             if job.status == .received || job.status == .waitingForAI || job.status == .waitingForNotion {
                 activeProcessingJobId = job.id
                 PipelineLogger.log(stage: "job claimed", jobId: job.id, details: "Status: \(job.status)")
@@ -319,7 +403,7 @@ public final class JobQueueManager: ObservableObject {
         return nil
     }
     
-    private func updateJob(_ updatedJob: MeetingJob) {
+    func updateJob(_ updatedJob: MeetingJob) {
         if let idx = jobs.firstIndex(where: { $0.id == updatedJob.id }) {
             jobs[idx] = updatedJob
             saveJobs()
@@ -327,10 +411,15 @@ public final class JobQueueManager: ObservableObject {
     }
     
     private func runProcessingLoop() async {
+        // Each job gets at most one attempt per loop. Without this, a job that stays in
+        // .waitingForAI (Apple Intelligence unavailable) or .waitingForNotion (no credentials,
+        // network down) is re-claimed immediately and the loop never ends.
+        var attemptedThisPass: Set<UUID> = []
         while !Task.isCancelled {
-            guard let (_, job) = claimNextActionableJob() else {
+            guard let (_, job) = claimNextActionableJob(excluding: attemptedThisPass) else {
                 break
             }
+            attemptedThisPass.insert(job.id)
             await processClaimedJob(job: job)
             activeProcessingJobId = nil
         }
@@ -397,7 +486,7 @@ public final class JobQueueManager: ObservableObject {
             #endif
             
             do {
-                let raw = try await TranscriptionService.shared.transcribeAudioFile(at: audioURL, jobId: currentJob.id)
+                let raw = try await dependencies.transcribe(audioURL, currentJob.id)
                 // Critical Invariant: rawTranscript is set and never modified again
                 currentJob.rawTranscript = raw
                 currentJob.status = .waitingForAI
@@ -423,7 +512,7 @@ public final class JobQueueManager: ObservableObject {
         if currentJob.aiFormattedTranscript == nil || currentJob.intelligence == nil {
             guard let raw = currentJob.rawTranscript else { return }
             
-            let (aiAvailable, aiReason) = await MeetingAIService.shared.checkAvailability()
+            let (aiAvailable, aiReason) = await dependencies.checkAIAvailability()
             if !aiAvailable {
                 // Fail-safe: Keep transcript and job locally, mark Waiting for AI formatting
                 currentJob.status = .waitingForAI
@@ -437,10 +526,10 @@ public final class JobQueueManager: ObservableObject {
             PipelineLogger.log(stage: "state -> formatting", jobId: currentJob.id)
             
             do {
-                let (formatted, intelligence, title) = try await MeetingAIService.shared.processTranscript(
-                    rawTranscript: raw,
-                    date: currentJob.createdAt,
-                    jobId: currentJob.id
+                let (formatted, intelligence, title) = try await dependencies.structureTranscript(
+                    raw,
+                    currentJob.createdAt,
+                    currentJob.id
                 )
                 currentJob.aiFormattedTranscript = formatted
                 currentJob.intelligence = intelligence
@@ -465,10 +554,8 @@ public final class JobQueueManager: ObservableObject {
         // Step 3: Notion Upload
         // -------------------------------------------------------------
         if currentJob.status == .waitingForNotion || currentJob.status == .uploadingToNotion {
-            let token = await NotionService.shared.getApiKey()
-            let parent = await NotionService.shared.getParentPageId()
-            
-            if token == nil || token?.isEmpty == true || parent == nil || parent?.isEmpty == true {
+            let notionConfigured = await dependencies.notionCredentialsConfigured()
+            if !notionConfigured {
                 currentJob.status = .waitingForNotion
                 currentJob.errorMessage = "Notion token or parent page not configured in Settings."
                 updateJob(currentJob)
@@ -481,9 +568,9 @@ public final class JobQueueManager: ObservableObject {
             
             do {
                 let capturedId = currentJob.id
-                let (pageId, pageUrl) = try await NotionService.shared.uploadMeeting(
-                    job: currentJob,
-                    onPageCreated: { [weak self] newPageId in
+                let (pageId, pageUrl) = try await dependencies.uploadToNotion(
+                    currentJob,
+                    { [weak self] newPageId in
                         Task { @MainActor [weak self] in
                             guard let self = self,
                                   let idx = self.jobs.firstIndex(where: { $0.id == capturedId }) else { return }
@@ -570,10 +657,12 @@ public final class JobQueueManager: ObservableObject {
     }
     
     // For direct manual addition (e.g. synthetic test meeting)
-    public func addSyntheticMeeting(job: MeetingJob) {
+    public func addSyntheticMeeting(job: MeetingJob, startProcessing: Bool = true) {
         jobs.insert(job, at: 0)
         saveJobs()
-        startProcessingQueue()
+        if startProcessing {
+            startProcessingQueue()
+        }
     }
     
     #if DEBUG

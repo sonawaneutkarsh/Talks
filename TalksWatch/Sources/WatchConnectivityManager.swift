@@ -1,23 +1,15 @@
 import Foundation
-import WatchConnectivity
+@preconcurrency import WatchConnectivity
 import WatchKit
 
 // MARK: - Architectural Invariant: WatchConnectivity Transfer Pipeline
 // 1. Out-of-Process Transfer: WCSession.transferFile delegates actual transmission to the wcd daemon.
 //    Transfers complete even after the app is suspended or the user leaves the app.
-// 2. Persistent Transfer Ledger: Pending transfers are stored in Documents/watch_transfers.json.
-// 3. Verified ACK Deletion: Local recordings are removed only after the phone sends a verified ACK
-//    via transferUserInfo or didReceiveMessage.
+// 2. Persistent Transfer Ledger: Pending transfers are stored in Documents/watch_transfers.json
+//    (WatchTransferLedger in TalksShared, which is unit-tested from the iOS test bundle).
+// 3. Verified ACK Deletion: Local recordings are removed only after the phone sends an ACK for
+//    that exact recording ID via transferUserInfo or didReceiveMessage.
 // 4. Zero Main-Thread Blocking: All WCSession interactions and callbacks are non-blocking and asynchronous.
-
-public struct WatchTransferRecord: Codable, Identifiable {
-    public let id: UUID
-    public let createdAt: Date
-    public let duration: TimeInterval
-    public let fileRelativePath: String
-    public var isTransferred: Bool
-    public var isAcknowledgedByPhone: Bool
-}
 
 public struct WatchDiagnosticsInfo: Equatable {
     public var recordingId: String = "None"
@@ -45,14 +37,17 @@ public final class WatchConnectivityManager: NSObject, ObservableObject {
     @Published public private(set) var isPinging = false
     
     private var session: WCSession?
-    private let registryURL: URL
+    private var ledger: WatchTransferLedger
     
     public override init() {
         let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        self.registryURL = docs.appendingPathComponent("watch_transfers.json")
+        self.ledger = WatchTransferLedger(
+            registryURL: docs.appendingPathComponent("watch_transfers.json"),
+            recordingsDirectory: docs.appendingPathComponent("WatchRecordings", isDirectory: true)
+        )
         super.init()
         
-        loadRecords()
+        pendingRecords = ledger.records
         setupWatchConnectivity()
     }
     
@@ -93,40 +88,17 @@ public final class WatchConnectivityManager: NSObject, ObservableObject {
         isConnectedToPhone = (activationState == .activated && isReachable)
     }
     
-    private func loadRecords() {
-        guard FileManager.default.fileExists(atPath: registryURL.path) else { return }
-        do {
-            let data = try Data(contentsOf: registryURL)
-            let records = try JSONDecoder().decode([WatchTransferRecord].self, from: data)
-            self.pendingRecords = records
-        } catch {
-            print("[Watch WCSession] Failed to load watch transfers registry: \(error)")
-        }
-    }
-    
-    private func saveRecords() {
-        do {
-            let data = try JSONEncoder().encode(pendingRecords)
-            try data.write(to: registryURL, options: .atomic)
-        } catch {
-            print("[Watch WCSession] Failed to save watch transfers registry: \(error)")
-        }
-    }
-    
     public func queueFileForTransfer(fileURL: URL, recordingId: UUID, duration: TimeInterval, createdAt: Date) {
         let relativePath = fileURL.lastPathComponent
         let record = WatchTransferRecord(
             id: recordingId,
             createdAt: createdAt,
             duration: duration,
-            fileRelativePath: relativePath,
-            isTransferred: false,
-            isAcknowledgedByPhone: false
+            fileRelativePath: relativePath
         )
         
-        pendingRecords.removeAll { $0.id == recordingId }
-        pendingRecords.append(record)
-        saveRecords()
+        ledger.track(record)
+        pendingRecords = ledger.records
         
         transferStatusMessage = "Transferring to iPhone..."
         performFileTransfer(record: record, fileURL: fileURL, force: false)
@@ -210,10 +182,9 @@ public final class WatchConnectivityManager: NSObject, ObservableObject {
             session?.activate()
             return
         }
-        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let dir = docs.appendingPathComponent("WatchRecordings", isDirectory: true)
+        let dir = ledger.recordingsDirectory
         
-        for record in pendingRecords where !record.isAcknowledgedByPhone {
+        for record in ledger.pendingRecords {
             let fileURL = dir.appendingPathComponent(record.fileRelativePath)
             if FileManager.default.fileExists(atPath: fileURL.path) {
                 performFileTransfer(record: record, fileURL: fileURL, force: force)
@@ -254,10 +225,7 @@ public final class WatchConnectivityManager: NSObject, ObservableObject {
         
         // Dispatch session.sendMessage fully asynchronously off the main thread
         // to guarantee that Mach port IPC to wcd never blocks the Watch UI
-        let messagePayload: [String: Any] = [
-            "type": "ping",
-            "timestamp": Date().timeIntervalSince1970
-        ]
+        let pingTimestamp = Date().timeIntervalSince1970
         
         DispatchQueue.global(qos: .userInitiated).async { [weak self, weak session] in
             guard let session = session else {
@@ -270,6 +238,7 @@ public final class WatchConnectivityManager: NSObject, ObservableObject {
             
             print("[Watch WCSession] [PING] sendMessage called on background thread. isMainThread=\(Thread.isMainThread)")
             
+            let messagePayload: [String: Any] = ["type": "ping", "timestamp": pingTimestamp]
             session.sendMessage(messagePayload, replyHandler: { reply in
                 let response = reply["response"] as? String ?? "OK"
                 let isMain = Thread.isMainThread
@@ -298,30 +267,25 @@ public final class WatchConnectivityManager: NSObject, ObservableObject {
 #endif
     
     public func handlePhoneAcknowledgement(recordingId: UUID) {
-        guard let index = pendingRecords.firstIndex(where: { $0.id == recordingId }) else {
+        // Delete local Watch audio only after the iPhone acknowledges this exact recording ID.
+        let outcome = ledger.acknowledge(recordingId: recordingId)
+        pendingRecords = ledger.records
+        
+        switch outcome {
+        case .untracked:
             print("[Watch WCSession] Received ACK for untracked recordingId: \(recordingId)")
             return
+        case .acknowledgedAndDeleted:
+            print("[Watch WCSession] Phone ACK confirmed for \(recordingId). Removed local Watch copy.")
+        case .acknowledgedFileAlreadyMissing:
+            print("[Watch WCSession] Phone ACK confirmed for \(recordingId). Local copy was already removed.")
+        case .acknowledgedDeleteFailed(let reason):
+            print("[Watch WCSession] Error removing local recording after ACK: \(reason)")
         }
-        
-        pendingRecords[index].isAcknowledgedByPhone = true
-        pendingRecords[index].isTransferred = true
-        saveRecords()
         
         diagnostics.lastAckReceived = "\(recordingId.uuidString.prefix(8)) ✓"
         transferStatusMessage = "Transferred & Verified by iPhone ✓"
         WatchRecordingManager.shared.updateStatusMessage("Sent ✓")
-        
-        // PRODUCTION BEHAVIOR: Delete local Watch audio only after durable ACK is confirmed
-        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        let fileURL = docs.appendingPathComponent("WatchRecordings", isDirectory: true).appendingPathComponent(pendingRecords[index].fileRelativePath)
-        if FileManager.default.fileExists(atPath: fileURL.path) {
-            do {
-                try FileManager.default.removeItem(at: fileURL)
-                print("[Watch WCSession] Phone ACK confirmed for \(fileURL.lastPathComponent). Safely removed local Watch copy.")
-            } catch {
-                print("[Watch WCSession] Error removing local recording after ACK: \(error.localizedDescription)")
-            }
-        }
     }
 }
 

@@ -3,15 +3,15 @@ import AVFoundation
 
 public enum SyntheticPipelineRunner {
     public static let sampleRawTranscript = """
-    Professor: So Utkarsh, let's review the ADR research planning. For the anomaly detection pipeline, we need to compare the autoencoder reconstruction loss against the isolation forest baseline on the synthetic telemetry dataset.
+    Professor: So, let's review the ADR research planning. For the anomaly detection pipeline, we need to compare the autoencoder reconstruction loss against the isolation forest baseline on the synthetic telemetry dataset.
     
-    Utkarsh: Right, um, I was wondering, um, if we should also include the Mahalanobis distance metric or if that's, like, overkill for the initial paper draft?
+    Student: Right, um, I was wondering, um, if we should also include the Mahalanobis distance metric or if that's, like, overkill for the initial paper draft?
     
     Professor: That's a good question. Let's start with just the autoencoder and baseline first. If we have time before the October 15 submission deadline, we can add Mahalanobis. Also, make sure to write down the mathematical formulation of the loss function in section 3.
     
-    Utkarsh: Sounds good. I will, um, implement the benchmark script by this Friday, October 2nd, and share the wandb dashboard link with you.
+    Student: Sounds good. I will, um, implement the benchmark script by this Friday, October 2nd, and share the wandb dashboard link with you.
     
-    Professor: Perfect. And for our next meeting on Monday at 2 PM, please have the preliminary ROC curves ready. If you run into CUDA memory issues on the cluster, ping Sarah for node allocation.
+    Professor: Perfect. And for our next meeting on Monday at 2 PM, please have the preliminary ROC curves ready. If you run into CUDA memory issues on the cluster, ask the cluster admins for node allocation.
     """
     
     /// Generates a valid test M4A audio file containing a pure tone or silence,

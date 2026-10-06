@@ -5,8 +5,10 @@ import Foundation
 //    Zero intermediate servers or proxy relays.
 // 2. Keychain Security: Integration tokens and parent IDs are secured in iOS Keychain.
 // 3. Parent-Child Resolution: Automatically creates or caches child 'Talks' page.
-// 4. Duplicate Prevention: Queries existing pages by recording ID to guarantee
-//    idempotent uploads and zero duplicate Notion pages.
+// 4. Idempotent Retry: The created page ID is persisted (onPageCreated) as soon as Notion
+//    returns it. A retry reuses that page, counts its existing child blocks, and appends only
+//    the missing ones. If the count cannot be read completely, the upload fails and retries
+//    later instead of guessing (a partial count would append duplicate blocks).
 
 public enum NotionError: LocalizedError {
     case missingCredentials
@@ -273,16 +275,30 @@ public actor NotionService {
             }
             let request = try createRequest(path: path, method: "GET", token: token)
             let (data, response) = try await sendWithRetry(request)
-            guard let http = response as? HTTPURLResponse, (200...299).contains(http.statusCode) else {
-                return count
+            // Never return a partial count: the caller appends `allBlocks.dropFirst(count)`,
+            // so an undercount would duplicate blocks that already exist on the page.
+            guard let http = response as? HTTPURLResponse else {
+                throw NotionError.httpError(statusCode: 0, message: "No response while counting existing blocks (counted \(count) so far).")
+            }
+            if http.statusCode == 429 { throw NotionError.rateLimited }
+            guard (200...299).contains(http.statusCode) else {
+                let errText = String(data: data, encoding: .utf8) ?? ""
+                throw NotionError.httpError(statusCode: http.statusCode, message: "Could not count existing blocks (counted \(count) so far): \(errText)")
             }
             guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
                   let results = json["results"] as? [[String: Any]] else {
-                return count
+                throw NotionError.parsingError("Could not parse existing block list (counted \(count) so far).")
             }
             count += results.count
             let hasMore = json["has_more"] as? Bool ?? false
-            cursor = hasMore ? (json["next_cursor"] as? String) : nil
+            if hasMore {
+                guard let next = json["next_cursor"] as? String, !next.isEmpty else {
+                    throw NotionError.parsingError("Block list reported more results without a next_cursor (counted \(count) so far).")
+                }
+                cursor = next
+            } else {
+                cursor = nil
+            }
         } while cursor != nil
         
         return count

@@ -13,7 +13,7 @@ public struct WatchContentView: View {
     public var body: some View {
         ZStack {
             if recordingManager.isRecording && isScreenOff {
-                // MARK: - Phase 4: Screen Off Distraction-Free Mode
+                // MARK: - Screen Off Distraction-Free Mode
                 // Complete blackout for academic/research meetings
                 Color.black
                     .ignoresSafeArea()
