@@ -1,20 +1,39 @@
 # Talks
 
-> Distraction-free meeting capture for Apple Watch and iPhone with on-device intelligence and direct Notion synchronization.
+[![CI](https://github.com/sonawaneutkarsh/Talks/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/sonawaneutkarsh/Talks/actions/workflows/ci.yml)
+
+> Meeting capture for Apple Watch and iPhone: record on the Watch, transcribe and summarize on the iPhone with on-device models, and save the notes to Notion.
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/watch-record-idle.png" alt="Apple Watch: idle screen with the Record button" width="200"></td>
+    <td align="center"><img src="docs/screenshots/watch-recording-active.png" alt="Apple Watch: recording in progress with timer, Stop, and Screen Off" width="200"></td>
+    <td align="center"><img src="docs/screenshots/iphone-talk-detail.png" alt="iPhone: Talk detail with AI-formatted transcript, summary, and key points" width="180"></td>
+    <td align="center"><img src="docs/screenshots/iphone-settings.png" alt="iPhone: Settings with Notion credentials and on-device processing status" width="180"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Watch: ready</sub></td>
+    <td align="center"><sub>Watch: recording</sub></td>
+    <td align="center"><sub>iPhone: Talk detail</sub></td>
+    <td align="center"><sub>iPhone: Settings</sub></td>
+  </tr>
+</table>
+
+<sub>Screenshots use a demo recording. The parent page ID shown is a placeholder.</sub>
 
 ---
 
-## 1. Product Overview
+## Product Overview
 
-**Talks** is an open-source, private-by-design meeting recording and synthesis system designed specifically for professors, researchers, and engineers. It captures meetings directly from your Apple Watch, safely transfers the audio to your iPhone over background channels, transcribes and structures the meeting using Apple's on-device foundation models, and creates an organized, beautifully formatted summary in your Notion workspace.
+**Talks** is an open-source meeting recorder for lectures, advising sessions, and research meetings. You record on the Apple Watch. The audio moves to the iPhone in the background. The iPhone transcribes it on device, uses Apple's on-device Foundation Models to write a title, summary, key points, decisions, and action items, and then creates a page in your Notion workspace.
 
-- **No Cloud AI Processing**: Audio and transcripts never touch third-party AI or speech servers. Transcription and synthesis execute locally on your iPhone using Apple Silicon hardware acceleration, before finalized notes are uploaded directly to your own Notion workspace.
-- **No Recurring Subscription or API Costs**: No paid API keys for speech-to-text or large language models. Direct integration with the standard Notion API.
-- **Distraction-Free**: Includes an academic "Screen Off" mode that blanks the watch face during research meetings while maintaining continuous recording.
+- **No cloud AI processing**: Audio and transcripts are not sent to third-party speech or AI services. Transcription and structuring run on the iPhone. The only network traffic is the Notion API call that writes the finished notes to your own workspace.
+- **No paid API keys**: Speech and language models are Apple's on-device frameworks. Notion uses a free internal integration token.
+- **Screen Off mode**: During a meeting you can blank the Watch display while recording continues.
 
 ---
 
-## 2. System Architecture
+## System Architecture
 
 ```
 ┌─────────────────┐
@@ -22,61 +41,59 @@
 │  (TalksWatch)   │
 └────────┬────────┘
          │
-         │ 1. Record audio (AVAudioSession + WKExtendedRuntimeSession)
-         │ 2. Distraction-free Screen Off capture
-         │ 3. On Stop: Durable background file transfer (WCSession.transferFile)
+         │ 1. Record audio (AVAudioRecorder + WKExtendedRuntimeSession)
+         │ 2. Optional Screen Off mode while recording
+         │ 3. On Stop: background file transfer (WCSession.transferFile)
          ▼
 ┌─────────────────┐
 │     iPhone      │
 │     (Talks)     │
 └────────┬────────┘
          │
-         │ 4. Receive audio & save atomically to disk
-         │ 5. Send durable background ACK (WCSession.transferUserInfo)
-         │ 6. Enqueue durable job in JobQueueManager
+         │ 4. Receive audio and move it into Documents/Recordings/
+         │ 5. Enqueue a persistent job in JobQueueManager
+         │ 6. Send the ACK to the Watch (WCSession.transferUserInfo)
          │
-         ├───▶ [7. On-Device Speech Transcription]
-         │     • SpeechAnalyzer (#available(iOS 26.0, *)) with streaming watchdog
-         │     • On-device SFSpeechRecognizer fallback on older supported iOS versions
+         ├───▶ [7. On-device speech transcription]
+         │     • SpeechAnalyzer on iOS 26, guarded by a timeout watchdog
+         │     • On-device SFSpeechRecognizer fallback (iOS 18, or if SpeechAnalyzer fails or hangs)
          │
-         ├───▶ [8. Apple Intelligence Structuring]
-         │     • Foundation Models (System LLM)
-         │     • Generates Title, Summary, Key Points, Decisions, Action Items
+         ├───▶ [8. On-device structuring with Apple Foundation Models]
+         │     • Title, summary, key points, decisions, action items, follow-ups
          │
-         └───▶ [9. Direct Notion Upload]
-               • Creates page under configured 'Talks' parent
-               • Syncs structured blocks + collapsible raw transcript
-               • Zero duplicate page protection
+         └───▶ [9. Notion upload]
+               • Creates a page under a 'Talks' child page of your configured parent page
+               • Persists the page ID at creation; a retry appends only missing blocks
 ```
 
 ---
 
-## 3. Key Features
+## Key Features
 
-- **One-Tap Apple Watch Recording**: Large, high-contrast record button with haptic feedback.
-- **Screen Off Distraction-Free Mode**: Tap "Screen Off" during meetings to blank the watch display (`Color.black`) with a subtle, non-intrusive corner indicator. Safe wake-on-tap returns to controls without interrupting the recording.
-- **Durable Background Transfer**: Transfers audio out-of-process via `WCSession.transferFile`. Audio on the Watch is only deleted after the iPhone sends a verified acknowledgement.
-- **On-Device Speech Transcription**: Leverages Apple's Speech framework (`SpeechAnalyzer` under `#available(iOS 26.0, *)`, backed by an on-device `SFSpeechRecognizer` fallback on older supported iOS versions with cancellation-resistant watchdog isolation).
-- **Apple Intelligence Structuring**: Extracts meeting titles, summaries, key takeaways, agreed decisions, and action items directly on device.
-- **Direct Notion Sync**: Formats notes with native Notion callout, heading, bullet, and todo blocks. Retains full raw transcripts in an expandable toggle block.
-- **Safe Local Swipe Deletion**: Swipe left on any completed or failed Talk to delete the local recording and metadata from iPhone. Active processing jobs are strictly protected, and external Notion pages are never deleted.
-- **Resilient Offline Queue**: Jobs persist across app force-quits, reboots, and transient network interruptions. Failed uploads can be retried with one tap.
+- **One-tap Watch recording**: A large Record button; Stop ends the recording and starts the transfer.
+- **Screen Off mode**: Tap "Screen Off" while recording to show a black screen with a small corner indicator. A tap brings the controls back without stopping the recording.
+- **ACK-gated transfer**: Audio leaves the Watch through `WCSession.transferFile`. The Watch deletes its copy only after the iPhone sends an acknowledgement for that recording ID, and the iPhone sends that acknowledgement only after the recording is saved in its job queue.
+- **On-device transcription**: `SpeechAnalyzer` (iOS 26) with a watchdog. If it fails or hangs, the job falls back to on-device `SFSpeechRecognizer`, and SpeechAnalyzer is skipped for the rest of the session.
+- **On-device structuring**: Apple Foundation Models produce the title, summary, key points, decisions, action items, and follow-ups. Long transcripts are split into chunks that fit the model's context window.
+- **Notion page layout**: AI-formatted transcript, Summary, Key Points, Decisions, Action Items (as to-do blocks), Follow-Ups, and the unedited raw transcript at the bottom. Text is split to stay under Notion's 2,000-character block limit, and blocks are sent in batches of 100.
+- **Persistent queue**: Jobs survive app termination and reboots. On relaunch, interrupted jobs are reset to the last safe state. Failed jobs can be retried with one tap.
+- **Local deletion**: Swipe left on a completed or failed Talk to delete the local recording and metadata from the iPhone. Jobs that are still processing cannot be deleted. Notion pages are never deleted.
 
 ---
 
 ## Requirements
 
-- **iPhone**: iOS 18.0 or later (minimum OS required to launch Talks, ingest background Watch audio transfers, and transcribe audio locally).
-- **Apple Watch**: Any Apple Watch capable of running watchOS 11.0 or later.
-- **Xcode**: Xcode 26.0 or later (Xcode 27.0 with Swift 6 and iOS 26+ SDK required to compile FoundationModels).
-- **Supported Workflows by OS & Hardware**:
-  - **iOS 26+ with Apple Intelligence** (iPhone 15 Pro, iPhone 16 series, or newer with Apple Intelligence enabled): Full automated end-to-end pipeline — Watch recording → background transfer → on-device `SpeechAnalyzer` transcription → on-device Foundation Models AI structuring → automatic Notion upload.
-  - **iOS 18–25 or Apple Intelligence unavailable**: Recording, background transfer, and on-device transcription work normally. The job then remains at .waitingForAI until Apple Intelligence becomes available on that device, such as after upgrading to a supported OS on compatible hardware.
-- **Notion Integration**: Free Notion Internal Integration Token and parent page ID with integration connection access (required for the Notion upload stage).
+- **iPhone**: iOS 18.0 or later.
+- **Apple Watch**: watchOS 11.0 or later.
+- **Xcode**: Xcode 26 or later (iOS 26 SDK, which includes `SpeechAnalyzer` and `FoundationModels`). CI builds with Xcode 26.6.
+- **What runs where**:
+  - **iOS 26 with Apple Intelligence enabled** (iPhone 15 Pro, iPhone 16 series, or newer): the full pipeline runs automatically, from Watch recording to the Notion page.
+  - **iOS 18, or iOS 26 without Apple Intelligence**: recording, transfer, and on-device transcription work. The job then waits at `.waitingForAI` with the transcript saved, and continues when Apple Intelligence becomes available on that device.
+- **Notion**: an internal integration token and a parent page that is connected to the integration.
 
 ---
 
-## 5. Setup & Installation
+## Setup & Installation
 
 ### Step 1: Clone the Repository
 ```bash
@@ -87,71 +104,97 @@ cd Talks
 ### Step 2: Configure Notion Integration
 1. Go to [Notion Developers](https://www.notion.so/my-integrations) and create a **New integration**.
 2. Give it a name (e.g. `Talks Assistant`) and copy the **Internal Integration Token**.
-3. Open Notion in your browser, create or navigate to a page where you want meeting notes stored (e.g., `Research Notes` or `Meetings`).
-4. Click the `...` menu in the upper-right corner of the parent page, select **Connections**, and connect your integration.
-5. Copy the parent page link or page ID (the 32-character hexadecimal string in the page URL).
+3. Open Notion in your browser, then create or open the page where you want meeting notes stored (e.g. `Research Notes` or `Meetings`).
+4. Click the `...` menu in the upper-right corner of that page, select **Connections**, and connect your integration.
+5. Copy the page link or page ID (the 32-character hexadecimal string in the page URL).
 
 ### Step 3: Build & Deploy via Xcode
 1. Open `Talks.xcodeproj` in Xcode.
 2. Select the `Talks` scheme and choose your physical iPhone as the run destination.
-3. Configure your Apple Developer signing certificate under **Signing & Capabilities** for both `Talks` and `TalksWatch`.
+3. Select your signing team under **Signing & Capabilities** for both `Talks` and `TalksWatch`.
 4. Press **Cmd + R** to install and run Talks on your iPhone.
-5. In the iPhone Talks app, open **Settings (gear icon)**:
-   - Paste your Notion Integration Token into **Notion Integration Token**.
-   - Paste your Parent Page URL or ID into **Parent Notion Page**.
+5. In the iPhone app, open **Settings (gear icon)**:
+   - Paste your token into **Notion Integration Token**.
+   - Paste your page URL or ID into **Parent Notion Page**.
    - Tap **Save Credentials to Keychain**.
-   - Tap **Test Connection & Sync 'Talks' Page** to verify setup.
-6. Switch schemes to `TalksWatch`, select your physical Apple Watch, and build & run.
+   - Tap **Test Connection & Sync 'Talks' Page** to verify the setup.
+6. Switch to the `TalksWatch` scheme, select your physical Apple Watch, and build and run.
 
 ### Using Talks on Your Own Apple Developer Account
-When building Talks for personal devices:
-1. **Choose Signing Team**: In Xcode, open `Talks.xcodeproj`. Under **Signing & Capabilities**, select your personal or organization Apple Developer Team for both the `Talks` (iOS) and `TalksWatch` (watchOS) targets.
-2. **Unique Bundle Identifiers**: If the default bundle identifiers (`com.personal.talks` and `com.personal.talks.watchkitapp`) conflict with existing App IDs on your developer account, change them to your own unique prefix (e.g. `com.yourname.talks` and `com.yourname.talks.watchkitapp`). Ensure you preserve the Watch companion relationship: the Watch app's bundle ID must be prefixed with the iOS app's bundle ID (e.g., `<iOS-Bundle-ID>.watchkitapp`). You can also configure this prefix in `project.yml` under `bundleIdPrefix` and run `xcodegen generate`.
+1. **Choose a signing team**: Under **Signing & Capabilities**, select your personal or organization team for both the `Talks` (iOS) and `TalksWatch` (watchOS) targets.
+2. **Unique bundle identifiers**: If `com.personal.talks` and `com.personal.talks.watchkitapp` conflict with App IDs on your account, change them to your own prefix (e.g. `com.yourname.talks` and `com.yourname.talks.watchkitapp`). The Watch app's bundle ID must start with the iOS app's bundle ID (`<iOS-Bundle-ID>.watchkitapp`). You can also set `bundleIdPrefix` in `project.yml` and run `xcodegen generate`.
 
 ---
 
-## 6. Physical Device Troubleshooting Guide
+## Tests
+
+The XCTest suite lives in `TalksTests/` and runs on the iOS Simulator in CI ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)) on every push to `main` and every pull request. CI also builds the watchOS app on its own.
+
+**57 XCTest cases passing in CI** on the iOS Simulator.
+
+```bash
+xcodebuild test \
+  -project Talks.xcodeproj \
+  -scheme Talks \
+  -destination 'platform=iOS Simulator,name=iPhone 17' \
+  CODE_SIGNING_ALLOWED=NO
+```
+
+| File | What it covers |
+|---|---|
+| `JobQueueTests.swift` | Queue persistence and relaunch reconciliation, single-worker processing, retry, background-time expiration, corrupt queue recovery, local deletion rules |
+| `NotionServiceTests.swift` | Page layout, 2,000-character splitting, 429 retry, idempotent retry that appends only missing blocks, failure of the existing-block count |
+| `TranscriptionTests.swift` | Audio file checks, transcript chunking, the speech watchdog, SpeechAnalyzer → SFSpeechRecognizer fallback, circuit breaker |
+| `ConnectivityAndLaunchTests.swift` | Enqueue-before-ACK on the iPhone, ACK-gated deletion on the Watch, structured logging, launch-time UI construction |
+
+Queue tests use a temporary directory and injected pipeline stages (`QueueDependencies`), so they do not depend on the app's shared state or on real Speech, Apple Intelligence, or Notion services.
+
+**Simulator limits**: The simulator cannot pair an Apple Watch, record from the Watch microphone, or run Apple Intelligence reliably. CI therefore does not cover `WCSession` delivery between devices, real speech recognition, or real Foundation Models output. The code on each side of those boundaries is tested; end-to-end behavior needs a physical iPhone and Apple Watch.
+
+---
+
+## Physical Device Troubleshooting Guide
 
 ### WatchConnectivity Pairing & File Delivery
-- **Watch App Installed check**: Ensure `TalksWatch.app` is embedded inside `Talks.app` (configured automatically in `project.yml`).
-- **Transfer Timing**: `WCSession.transferFile` runs out-of-process via Apple's `wcd` daemon. Audio transfers in the background within 10–30 seconds after tapping Stop, depending on Bluetooth/Wi-Fi signal.
-- **Durable Local Retention**: Recordings remain stored locally in `Documents/WatchRecordings/` on Apple Watch until the phone sends a verified ACK (`transferUserInfo`). If you walk out of range before transfer finishes, the transfer resumes automatically once back in range.
+- **Watch app installed**: `TalksWatch.app` is embedded inside `Talks.app` (configured in `project.yml`).
+- **Transfer timing**: `WCSession.transferFile` runs out of process. Delivery time depends on the Bluetooth/Wi-Fi link and on when watchOS schedules the transfer.
+- **Local retention on the Watch**: Recordings stay in `Documents/WatchRecordings/` on the Watch until the iPhone's ACK (`transferUserInfo`) arrives. If you walk out of range, the transfer resumes when the devices reconnect.
 
 ### Speech Model Assets
-- Speech recognition models download once over Wi-Fi when first required by iOS. Check **Settings → Processing** to confirm transcription readiness.
-- A built-in watchdog prevents speech analyzer hangs: if processing exceeds timeout boundaries, Talks automatically falls back to secondary on-device recognition engines without losing meeting audio.
+- iOS downloads the speech model once, over Wi-Fi, when it is first needed. Check **Settings → Processing** to confirm that transcription is ready.
+- If SpeechAnalyzer exceeds its timeout, Talks falls back to on-device `SFSpeechRecognizer`. The audio is kept until the job finishes.
 
 ### Notion Connection
-- If connection fails, confirm your Notion integration is added to the parent page via **Page Menu (...) → Add connections**.
-- Notion tokens are stored securely in the iOS Keychain and are never logged or exported.
+- If the connection fails, confirm that your integration is connected to the parent page via **Page menu (...) → Connections**.
+- The Notion token is stored in the iOS Keychain.
 
 ---
 
-## 7. Architecture & Design Decisions
+## Architecture & Design Decisions
 
 ### Why On-Device AI Processing?
-- **Academic & Research Confidentiality**: Meeting discussions with collaborators, students, and industry partners often involve unpublished data, intellectual property, or confidential disclosures. Keeping audio transcription and AI structuring entirely local prevents exposing sensitive meeting discussions to third-party AI cloud services.
-- **Zero Ongoing AI Costs**: Commercial LLM and STT APIs charge recurring fees per minute and per token. By running speech recognition and note structuring locally on Apple Silicon, Talks requires no third-party AI subscription or per-meeting API costs.
+- **Confidentiality**: Research meetings can involve unpublished data or confidential disclosures. Keeping transcription and structuring on the device means those conversations are not sent to third-party AI services.
+- **No per-use cost**: Cloud speech and LLM APIs charge per minute or per token. On-device models have no usage fees.
 
-### Why Background Transfers vs. Live Streaming?
-- Live streaming audio over Bluetooth during a 90-minute lecture drains watch battery and is prone to packet loss if you step away from your phone.
-- Recording locally to high-efficiency AAC (`.m4a`) and performing background file transfers over `wcd` significantly reduces dropped audio segments from wireless dropouts and preserves battery efficiency.
+### Why Background Transfers Instead of Live Streaming?
+- Streaming audio over Bluetooth for a 90-minute lecture drains the Watch battery and loses audio when you step away from the phone.
+- Talks records locally to AAC (`.m4a`) and transfers the finished file, so a temporary disconnect delays the transfer instead of dropping audio.
 
 ### Crash & Force-Quit Resilience
-- State transitions are recorded in a persistent, atomic JSON job queue (`Documents/job_queue.json`).
-- If iOS terminates the app in the background, the queue resumes uncompleted jobs upon the next launch or background processing trigger.
-- Duplicate prevention hashes each recording ID and checks Notion for existing pages before creating new entries.
+- Every state change is written atomically to a JSON job queue (`Documents/queue.json`).
+- On the next launch or background processing run, interrupted jobs are reset to the last safe state (`.transcribing` → `.received`, `.formatting` → `.waitingForAI`, `.uploadingToNotion` → `.waitingForNotion`). A job whose audio is missing is marked failed instead of looping.
+- Each job is attempted at most once per processing pass, so a job that is waiting for Apple Intelligence or for Notion credentials does not keep the processor busy.
+- **Duplicate prevention**: Talks stores the Notion page ID as soon as Notion returns it. On retry it reuses that page, counts the blocks already on it, and appends only the missing ones. If that count cannot be read completely, the upload fails and is retried later rather than appending blocks that may already exist. Talks does not search Notion for existing pages, so a crash in the short window between page creation and saving its ID can still produce a second page.
 
 ---
 
-## 8. Privacy & Recording Consent
+## Privacy & Recording Consent
 
-- **Local Processing**: Audio recordings and transcripts remain entirely on your personal devices and are never transmitted to third-party AI or speech servers. The only external network communication is direct synchronization to your private Notion workspace via your configured integration credentials.
-- **Recording Consent**: Please ensure you comply with all applicable local, state, and institutional recording consent laws and regulations before recording lectures, advising sessions, or meetings with collaborators.
+- **Local processing**: Audio and transcripts stay on your devices and are not sent to third-party AI or speech services. The only external network traffic is the Notion API, using your own integration token.
+- **Recording consent**: Follow all applicable local, state, and institutional laws and policies on recording consent before you record lectures, advising sessions, or meetings.
 
 ---
 
-## 9. License
+## License
 
 MIT License. See [LICENSE](LICENSE) for details.
-
