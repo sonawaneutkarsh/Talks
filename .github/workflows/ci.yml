@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+  IOS_DESTINATION: platform=iOS Simulator,name=iPhone 17,OS=26.5
+
+jobs:
+  build-and-test:
+    name: Build iOS + watchOS, run XCTest
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Show toolchain
+        run: |
+          xcodebuild -version
+          xcrun simctl list devices available | grep -E "iPhone 17|Apple Watch" || true
+          xcodebuild -list -project Talks.xcodeproj
+
+      - name: Build watchOS app (TalksWatch)
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project Talks.xcodeproj \
+            -scheme TalksWatch \
+            -destination 'generic/platform=watchOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO | tee watch-build.log | grep -E "error:|warning: |BUILD (SUCCEEDED|FAILED)" || true
+          grep -q "BUILD SUCCEEDED" watch-build.log
+
+      - name: Build iOS app and test bundle (Talks, embeds TalksWatch)
+        run: |
+          set -o pipefail
+          xcodebuild build-for-testing \
+            -project Talks.xcodeproj \
+            -scheme Talks \
+            -destination "$IOS_DESTINATION" \
+            -derivedDataPath DerivedData \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee ios-build.log | grep -E "error:|warning: |\*\* TEST BUILD (SUCCEEDED|FAILED)" || true
+          grep -q "\*\* TEST BUILD SUCCEEDED \*\*" ios-build.log
+
+      - name: Run XCTest suite on iOS Simulator
+        run: |
+          set -o pipefail
+          xcodebuild test-without-building \
+            -project Talks.xcodeproj \
+            -scheme Talks \
+            -destination "$IOS_DESTINATION" \
+            -derivedDataPath DerivedData \
+            -resultBundlePath TestResults.xcresult \
+            -test-timeouts-enabled YES \
+            -maximum-test-execution-time-allowance 120 2>&1 | tee test.log | grep -E "error:|Test Case .*(passed|failed)|Executed|\*\* TEST" || true
+          grep -q "\*\* TEST EXECUTE SUCCEEDED \*\*" test.log
+
+      - name: Summarize test results
+        if: always()
+        run: |
+          if [ -d TestResults.xcresult ]; then
+            xcrun xcresulttool get test-results summary --path TestResults.xcresult --compact > summary.json || true
+            cat summary.json
+            python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          try:
+              s = json.load(open("summary.json"))
+          except Exception as e:
+              print(f"No xcresult summary ({e})"); raise SystemExit
+          print("### XCTest results")
+          for k in ("result", "totalTestCount", "passedTests", "failedTests", "skippedTests", "expectedFailures"):
+              print(f"- **{k}**: {s.get(k)}")
+          PY
+          fi
+
+      - name: Upload logs and result bundle
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: xcode-logs
+          path: |
+            *.log
+            TestResults.xcresult
+          retention-days: 7
